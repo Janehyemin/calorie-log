@@ -1,3 +1,6 @@
+FILE_NAME = 'log.data'
+
+
 class FoodLog:
     def __init__(self, date, meal_time, food_name, portion, calorie):
         self.date = date
@@ -7,13 +10,17 @@ class FoodLog:
         self.calorie = calorie
 
     def __str__(self):
-        return '날짜 : %s / 구분 : %s / 음식 : %s / 양 : %s / 칼로리 : %s' % (
-            self.date,
-            self.meal_time,
-            self.food_name,
-            self.portion,
-            self.calorie
-        )
+        return f'날짜 : {self.date} / 구분 : {self.meal_time} / 음식 : {self.food_name} / ' \
+            f'양 : {self.portion} / 칼로리 : {self.calorie}'
+
+    def to_csv(self):
+        return f'{self.date},{self.meal_time},' \
+            f'{self.food_name},{self.portion},{self.calorie}'
+
+    @staticmethod
+    def from_csv(line):
+        line = line.split(',')
+        return FoodLog(*line)
 
 
 def create_food_log(food_logs):
@@ -36,15 +43,42 @@ def delete_food_log(food_logs):
     del food_logs[-1]
 
 
+def load_from_file():
+    result = []
+    try:
+        with open(FILE_NAME, 'r') as f:
+            while True:
+                line = f.readline()
+                if not line:
+                    break
+                result.append(
+                    FoodLog.from_csv(line.split('\n')[0])
+                )
+    except FileNotFoundError:
+        pass
+
+    return result
+
+
+def store_to_file(food_logs):
+    with open(FILE_NAME, 'w') as f:
+        for idx in range(len(food_logs)):
+            f.write(food_logs[idx].to_csv())
+            if idx != len(food_logs) - 1:
+                f.write('\n')
+
+
 if __name__ == '__main__':
-    food_logs = []
+    food_logs = load_from_file()
 
     while True:
         user_input = input('뭐할까? 입력하려면 입력이라고 말해? ')
         if user_input == '입력':
             create_food_log(food_logs)
+            store_to_file(food_logs)
         elif user_input == '조회':
             read_food_log(food_logs)
         elif user_input == '삭제':
             delete_food_log(food_logs)
+            store_to_file(food_logs)
             read_food_log(food_logs)
