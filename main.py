@@ -1,3 +1,5 @@
+from calories import find_food_list_by_name
+
 FILE_NAME = 'log.data'
 
 
@@ -27,8 +29,17 @@ def create_food_log(food_logs):
     date = input('날짜는? ')
     meal_time = input('아침, 점심, 저녁, 간식? ')
     food_name = input('뭐먹? ')
-    portion = input('몇 인분? ')
-    calorie = input('칼로리 멍미? ')
+
+    # TODO: 숫자가 아닌 게 들어왔을 때 예외처리
+    portion = int(input('몇 인분? '))
+    # calorie = input('칼로리 멍미? ')
+
+    food_list = find_food_list_by_name(food_name)
+
+    # TODO: 첫 번째 말고 정확하게 고르기 OR 고르게 하기
+    # TODO: 못 찾았을 때 처리
+    calorie = food_list[0]['kcal'] * portion
+    food_name = food_list[0]['name']
 
     food_log = FoodLog(date, meal_time, food_name, portion, calorie)
     food_logs.append(food_log)
